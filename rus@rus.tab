@@ -1,0 +1,10 @@
+;there table to translate rus to rus with using ASCII table only
+; from my programm "omakerus"
+
+ASCII  DB 'A','6','B',244,'D','E',15,'3','U','U','K','L','M','H','O',20,'P'
+                              ;
+       DB 'C','T','Y',216,'X',191,3,1,2,39,'"',39,'>',17,184,'a','b'
+       db 'v','r'   ;*
+       db 'g','e',42,184,'u','u','k','l','m','#','o','n'
+ASCII_ DB 'p','c',194,'y',216,'x',191,3,1,2,39,'"',39,'>',17,184,'E','e'
+ 

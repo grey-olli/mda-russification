@@ -1,0 +1,10 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;; This is my one (c) string:;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Copyright  MACRO 
+Cprght	     db 10,13,'Written by Olli <olli@no_such_address_anywhere>.',10,13,'$'
+             db 'License is GNU GPL',10,13
+	     db 'Author do''t carry any responsibility for lost or catch data',10,13
+	     db ' via  using or unusing this programm.',10,13
+	     db 'For contact with author see documentation.',10,13,'$'
+           ENDM

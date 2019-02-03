@@ -1,0 +1,23 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;This MACROS searchs for '/?'					   ;;
+;;Where direction trunsfering to:				   ;;
+;; 'lab1' if '/?' string was found                                 ;;
+;; 'lab2' ---"------"--- wasn't found or 			   ;;
+;; if enstead of '/?' in command line was smth. else. after '/'    ;;
+;;ATTANTION: This MACRO changing CX,SI                             ;;
+;;NOTE: cs must contain address of segment w/ labels 'lab1'&'lab2' ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+show MACRO lab1,lab2
+xor si,si
+mov cx,4
+repeat__:
+inc si
+cmp byte ptr cs:[80h.si],'/'
+jne nxt_stp
+cmp byte ptr cs:[80h.si.1],'?'
+jne lab2
+jmp lab1
+nxt_stp:
+jmp 
+loop repeat__
+     ENDM

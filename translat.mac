@@ -1,0 +1,146 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; This is macro procedure wich translate binary-digits to basisly-didgits
+;;It requires :  AX number to translate
+;;		 BX basis of required counting system
+;;		 DS:SI segment:offset for put symbols [RIGHT END]
+;;                      this can't be screen,becouse output has no byte
+;;                      attribut between symbols.
+;; WARNING: SI>=6 or length of count+1 .SI is the place of postfixes
+;;
+;;It returnes :  
+;; ATTANTION : This MACRO changed  W/O saving CX,BX,SI,AX
+;;		{That allow you do't save needless values}
+;;	      This MACRO do't exemine length feeld for chars ! 
+;;		Writed for .COM format!
+;;            As default this MACRO trunslate bin to :  dec or hex or octal 
+;;              if you wanner use this for another basises it requires 
+;;              a compleeting.[suffixes for all this basises are absent.For 
+;;		all basises more then 0ah symbols in output same as to hex]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;This MACRO procedure writed in accordains with next algoritm:
+;
+;; 1] chislo[bin] - osnov[bin]
+;; 2] sravn rasnost s osnovan
+;;  esli menshe ->jmp 3] inache +1 v perem. otnimanii & idem na 1]
+;;   [takim obrasom imeem chislo desjatkov]
+;;
+;;3] pribavliaem k poluchennomu nekoe smeschenie i poluchaem symbol-cifru is 
+;;     tabl ascii,kidaem ee v tekuschii razrjad.
+;;4] zatem smotrim skolko raz bilo vichteno, sravnivaem s 0,
+;;  esli ravno - perevod ne nu>|<en & chislo v ax - i est to samoe smeshenie 
+;; cifri v tabl. ASCII ,sravnivaem s osnovaniem,esli menshe - kidaem 
+;;  v tekuschii razrjad + 1,inache ->5]
+;;;5] Esli bolshe meniaem tecuschii razriad na ... +1 & povtorjaem 1] - 4] dlja
+;;     znachenija v peremennoi otnimanii
+;; i tak poka ne viidem cheres 4] 
+;;;;;;;Note: This translation returns 0 befor numbers > basis,so to make same 
+;;;;;;;for another one i set on exit procedure to insert '0' befor & system 
+;;;;;;;type at the and.
+       ;;;This is above algoritm realisation on assembler lanuage
+
+;;;;;;;;;;;;;;;;;;;;;;;header;;;;;;;;;;;;;;;;;
+;;;;.MODEL tiny
+;;;;.CODE
+;;;;org 100h
+;;;;str__:
+;;;;;;;;;;;;;;;;;;;;;;;header end;;;;;;;;;;;;;;;;;
+;;;;
+trnslt MACRO 
+
+;; 1] 
+;;;;;;number to translate in AX
+;;;;;;basis in BX 
+;;;;;;subtraction count = cx
+;;;;;;symbols counter in dx
+push si
+push ax
+inc si 
+xor cx,cx
+;; dx is counter off symbols in number {w/o postfix}
+xor dx,dx
+;; 2]
+aa22:
+cmp ax,bx
+jl short aa3   ; went to 3] if ax<bx
+inc cx
+sub ax,bx
+jmp short aa22 ; repeat 2]
+;;; 3]
+aa3:     ;here symbols being found
+         ;basis in bx
+	 ;current ax < basis
+	 ;[si] = current position to put symbol 
+
+inc dx
+dec si ;!   ;Becouse [si],when begining,was right range
+cmp bx,0ah
+ja short hexabasis   ;jmp if bx>0ah
+                     ;all lower basises has same translation algoritm
+		     ;becouse this MACRO for translating 2 to 8,10,16
+usualy:
+cmp ax,0
+jg short asas  ;it's checking counts w/sign "-"
+xor ax,ax
+asas:
+
+add ax,30h ;;??
+
+mov byte ptr [si],al      ;  30h=offset & code of symbol '0' in ASCII table
+jmp short aa4    ; jump to 4]
+;---------
+hexabasis:
+;;;;;cmp bx,010h       ;;Recoment this & all down with ';;;;;' to set
+;;;;;jne short errora  ;; no translation for basises bigger then hex & between 
+ 		       ;; hex & dec
+cmp ax,0ah
+jl short usualy         ;  jmp if ax<0ah
+add ax,61h-0ah
+mov byte ptr [si],al		;  61h=offset of symbol 'a'
+jmp short aa4
+;--
+;;;;;errora:
+;;;;;Here you can put error-handling procedure [for events ax > 0fh]
+;----------
+aa4:       ;;; 4]
+cmp cx,0
+je short exitaF
+cmp cx,1
+jne short nex
+mov byte ptr [si-1],'1'
+jmp short exitaF
+nex:
+mov ax,cx   ;!* Becouse after this all above will repeat for number in cx
+xor cx,cx
+jmp short aa22  ;here may be error,if near jmp [after insert error-handling]
+exitaF:
+pop ax
+pop si
+;------------- here i put counting system type after number
+;;;; I do't know how to write suffix for counting systems: 
+;;;;  3,4,5,6,7,9,11,12,13,14,15 & after 16 
+cmp bx,8
+jne short n1_
+mov byte ptr [si+1],'o' ;Becouse [si],when begining,was right range
+n1_:
+cmp bx,2h
+jne short nnn
+mov byte ptr [si+1],'b'
+nnn:
+cmp bx,10h
+jne short n_n
+mov byte ptr [si+1],'h'
+n_n:
+cmp bx,0ah
+jne short n_n_n
+mov byte ptr [si+1],'d'
+n_n_n:
+;-------------- etc...
+;; here i put zero befor each symbol
+cmp bx,10h
+jne EXI
+sub si,dx  ;becouse [si] is right margin
+mov byte ptr [si],'0'	
+EXI:
+;;;;
+ENDM
+;;;;end str__

@@ -1,0 +1,11 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;This MACROS display on the screen string 'str_name'
+;;There 'str_name' is name of string
+;;;;;ATTANTION: This MACRO changed AH
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+show MACRO str_name
+         lea dx,str_name
+         mov ah,9h
+         int 21h
+       ENDM

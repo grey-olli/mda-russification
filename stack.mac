@@ -1,0 +1,16 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;This 									   ;;
+;;     MACRO								   ;;
+;;           procedure set stack pointer to your buffer - array variable   ;;
+;;  [simly "make stack"] This is simle way,but it's not best for big arrays;;
+;; If you wanna make big stack,you must operate memory insteed of making   ;;
+;; big arrays in your programm,since this took too many place.		   ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+MakeStack MACRO StackBuf
+ cli
+ mov ax,cs
+ mov ss,ax
+ mov sp,length StackBuf
+ add sp,OFFSET StackBuf
+ sti
+ENDM
